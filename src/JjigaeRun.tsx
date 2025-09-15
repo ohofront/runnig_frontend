@@ -55,6 +55,7 @@ const zoomIn: Variants = {
 
 export default function JjigaeRun() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [showNotice, setShowNotice] = useState(true);
   const dateKorean = (date: string) =>
     new Date(date + "T00:00:00").toLocaleDateString("ko-KR", {
       year: "numeric",
@@ -172,6 +173,66 @@ export default function JjigaeRun() {
           </div>
         )}
       </header>
+
+      {/* Initial Notice Modal */}
+      {showNotice && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          className="fixed inset-0 z-[60] flex items-center justify-center"
+        >
+          <motion.div
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            onClick={() => setShowNotice(false)}
+          />
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.25, ease: "easeOut" }}
+            className="relative z-[61] w-[90%] max-w-md rounded-2xl bg-white shadow-2xl overflow-hidden"
+          >
+            <button
+              onClick={() => setShowNotice(false)}
+              aria-label="닫기"
+              className="absolute right-3 top-3 rounded-md p-1 text-neutral-500 hover:bg-neutral-100"
+            >
+              ✕
+            </button>
+            <div className="p-6 text-center">
+              <img
+                src={shirtImage}
+                alt="JJIGAE RUN 티셔츠"
+                className="w-40 h-40 object-cover mx-auto rounded-xl shadow mb-4"
+              />
+              <h3 className="text-xl font-extrabold">
+                티셔츠만 구매 가능합니다
+              </h3>
+              <p className="mt-2 text-sm text-neutral-600">
+                현재 행사 접수는 DM으로 문의해주세요. 티셔츠는 단독 구매가
+                가능해요.
+              </p>
+              <div className="mt-5 flex flex-col sm:flex-row gap-3">
+                <a
+                  href={IG_LINK}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex-1 inline-flex items-center justify-center rounded-xl bg-orange-600 px-4 py-2 font-semibold text-white hover:bg-orange-700"
+                >
+                  DM으로 문의
+                </a>
+                <button
+                  onClick={() => setShowNotice(false)}
+                  className="flex-1 rounded-xl border px-4 py-2 font-semibold hover:bg-neutral-100"
+                >
+                  JJIGAE RUN 신청하기
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      )}
 
       {/* Hero */}
       <section id="top" className="relative overflow-hidden w-full">

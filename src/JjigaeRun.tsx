@@ -112,7 +112,7 @@ export default function JjigaeRun() {
           {/* Mobile menu button */}
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="md:hidden rounded-md border p-2"
+            className="md:hidden rounded-md  p-2"
             aria-label="메뉴 열기"
             aria-expanded={mobileOpen}
           >

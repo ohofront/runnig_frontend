@@ -210,8 +210,8 @@ export default function JjigaeRun() {
                 티셔츠만 구매 가능합니다
               </h3>
               <p className="mt-2 text-sm text-neutral-600">
-                현재 행사 접수는 DM으로 문의해주세요. 티셔츠는 단독 구매가
-                가능해요.
+                현재 행사 접수는 DM으로 문의해주세요. <br /> 티셔츠는 단독
+                구매가 가능해요.
               </p>
               <div className="mt-5 flex flex-col sm:flex-row gap-3">
                 <a
@@ -248,12 +248,13 @@ export default function JjigaeRun() {
               <span className="text-orange-600">런닝</span>의 만남
             </h1>
             <p className="mt-4 text-neutral-700 leading-relaxed max-w-3xl">
-              여의도 고구마런 코스를 함께 달리고,{" "}
+              여의도 고구마런 코스를 함께 달리고, <br />
               <span className="font-semibold"> 영등포구 영신로 37길 3 2층</span>
-              의 가게로 복귀해 따끈한 찌개로 회복하는 특별 러닝 이벤트! 소수
-              정원으로 더욱 가깝고 안전하게 즐겨요.
+              의 가게로 복귀해 <br /> 따끈한 찌개로 회복하는 특별 러닝 이벤트!{" "}
+              <br />
+              소수 정원으로 더욱 가깝고 안전하게 즐겨요.
             </p>
-            <div className="mt-6 flex flex-wrap gap-3">
+            <div className="mt-6 flex flex-wrap gap-3 text-center justify-center md:justify-start">
               <a
                 href="#schedule"
                 className="rounded-xl bg-orange-600 px-5 py-3 font-semibold text-white shadow hover:bg-orange-700 transition"
@@ -300,7 +301,12 @@ export default function JjigaeRun() {
             <h2 className="text-xl font-bold mb-2">코스</h2>
             <p className="text-neutral-700">
               여의도 <span className="font-semibold">고구마런</span> 코스를 달린
-              후, 가게(서울특별시 영등포구 영신로 37길 3 2층)로 복귀합니다.
+              후, <br />
+              <span className="font-semibold">
+                {" "}
+                가게(서울특별시 영등포구 영신로 37길 3 2층)
+              </span>
+              로 복귀
             </p>
             <ul className="mt-4 list-none text-neutral-700 space-y-1">
               <li>페이스: 소통형 러닝 (초보 환영)</li>
@@ -323,7 +329,8 @@ export default function JjigaeRun() {
             </div>
             <p className="text-sm text-neutral-600">티셔츠 + 찌개 식사 포함</p>
             <p className="mt-3">
-              모집 인원: 한 타임당 선착순 <b>15명</b> (소수라도 진행)
+              모집 인원: 한 타임당 선착순 <b>15명</b> <br />
+              (소수라도 진행)
             </p>
             <a
               href={IG_LINK}

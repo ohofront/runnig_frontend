@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { motion, type Variants } from "framer-motion";
+import { useState, useRef } from "react";
+import { motion, type Variants, useScroll, useTransform } from "framer-motion";
 
 // 이미지 경로 (public/ 에 넣었다면 "/파일명" 형식)
 const logoHero = "/jjigaerun.jpeg";
@@ -56,6 +56,22 @@ const zoomIn: Variants = {
 export default function JjigaeRun() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [showNotice, setShowNotice] = useState(true);
+
+  // 모달 닫힌 뒤에만 애니메이션 시작
+  const animOn = !showNotice;
+
+  // Hero 패럴랙스
+  const heroRef = useRef<HTMLDivElement | null>(null);
+  const { scrollYProgress: heroProgress } = useScroll({
+    target: heroRef,
+    offset: ["start end", "end start"],
+  });
+  const parallaxY = useTransform(heroProgress, [0, 1], [0, -60]);
+  const parallaxScale = useTransform(heroProgress, [0, 1], [1, 1.05]);
+
+  // 전체 페이지 진행도 → 헤더 진행바
+  const { scrollYProgress: pageProgress } = useScroll();
+
   const dateKorean = (date: string) =>
     new Date(date + "T00:00:00").toLocaleDateString("ko-KR", {
       year: "numeric",
@@ -112,7 +128,7 @@ export default function JjigaeRun() {
           {/* Mobile menu button */}
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="md:hidden rounded-md  p-2"
+            className="md:hidden rounded-md p-2"
             aria-label="메뉴 열기"
             aria-expanded={mobileOpen}
           >
@@ -121,6 +137,12 @@ export default function JjigaeRun() {
             <span className="block h-0.5 w-5 bg-neutral-800" />
           </button>
         </div>
+
+        {/* Header progress bar */}
+        <motion.div
+          className="absolute bottom-0 left-0 right-0 h-0.5 origin-left bg-gradient-to-r from-orange-500 to-amber-500"
+          style={{ scaleX: pageProgress }}
+        />
 
         {/* Mobile dropdown */}
         {mobileOpen && (
@@ -235,11 +257,32 @@ export default function JjigaeRun() {
       )}
 
       {/* Hero */}
-      <section id="top" className="relative overflow-hidden w-full">
-        <div className="w-full px-4 py-16 grid md:grid-cols-2 gap-10 items-center">
+      <section
+        id="top"
+        ref={heroRef}
+        className="relative overflow-hidden w-full"
+      >
+        {/* floating blobs */}
+        <motion.div
+          aria-hidden
+          initial={{ opacity: 0 }}
+          animate={animOn ? { opacity: 1 } : { opacity: 0 }}
+          className="pointer-events-none absolute -top-16 -right-20 h-72 w-72 rounded-full bg-orange-200/40 blur-3xl"
+        />
+        <motion.div
+          aria-hidden
+          initial={{ opacity: 0 }}
+          animate={animOn ? { opacity: 1 } : { opacity: 0 }}
+          className="pointer-events-none absolute -bottom-20 -left-16 h-80 w-80 rounded-full bg-amber-200/40 blur-3xl"
+        />
+
+        <div
+          key={Number(animOn)}
+          className="w-full px-4 py-16 grid md:grid-cols-2 gap-10 items-center"
+        >
           <motion.div
             initial="hidden"
-            animate="show"
+            animate={animOn ? "show" : "hidden"}
             variants={fadeUp}
             className="text-center md:text-left"
           >
@@ -275,14 +318,20 @@ export default function JjigaeRun() {
           <motion.div
             className="relative"
             initial="hidden"
-            whileInView="show"
-            viewport={{ once: true }}
+            animate={animOn ? "show" : "hidden"}
             variants={zoomIn}
+            style={{ y: parallaxY, scale: parallaxScale }}
           >
             <img
               src={logoHero}
               alt="JJIGAE RUN 로고"
               className="w-full max-w-md rounded-2xl shadow-lg bg-white object-contain mx-auto"
+            />
+            <motion.div
+              aria-hidden
+              initial={{ opacity: 0 }}
+              animate={animOn ? { opacity: 1 } : { opacity: 0 }}
+              className="absolute inset-0 -z-10 rounded-2xl blur-2xl bg-gradient-to-tr from-orange-300/30 to-amber-300/30"
             />
           </motion.div>
         </div>
@@ -294,7 +343,8 @@ export default function JjigaeRun() {
           <motion.div
             className="rounded-2xl border border-neutral-200 p-6 bg-white w-full"
             initial="hidden"
-            whileInView="show"
+            animate={animOn ? undefined : "hidden"}
+            whileInView={animOn ? "show" : undefined}
             viewport={{ once: true }}
             variants={fadeUp}
           >
@@ -303,7 +353,6 @@ export default function JjigaeRun() {
               여의도 <span className="font-semibold">고구마런</span> 코스를 달린
               후, <br />
               <span className="font-semibold">
-                {" "}
                 가게(서울특별시 영등포구 영신로 37길 3 2층)
               </span>
               로 복귀
@@ -319,7 +368,8 @@ export default function JjigaeRun() {
             id="fee"
             className="rounded-2xl border border-neutral-200 p-6 bg-white w-full"
             initial="hidden"
-            whileInView="show"
+            animate={animOn ? undefined : "hidden"}
+            whileInView={animOn ? "show" : undefined}
             viewport={{ once: true }}
             variants={fadeUp}
           >
@@ -349,7 +399,8 @@ export default function JjigaeRun() {
         <motion.div
           className="rounded-2xl border border-neutral-200 bg-white p-6 w-full"
           initial="hidden"
-          whileInView="show"
+          animate={animOn ? undefined : "hidden"}
+          whileInView={animOn ? "show" : undefined}
           viewport={{ once: true }}
           variants={fadeUp}
         >
@@ -381,16 +432,31 @@ export default function JjigaeRun() {
 
       {/* Schedule */}
       <section id="schedule" className="w-full px-4 py-12">
-        <h2 className="text-2xl font-extrabold text-center">일정 & 시간</h2>
-        <div className="mt-6 grid md:grid-cols-2 gap-6 w-full">
+        <motion.h2
+          className="text-2xl font-extrabold text-center"
+          initial="hidden"
+          animate={animOn ? "show" : "hidden"}
+          variants={fadeUp}
+        >
+          일정 & 시간
+        </motion.h2>
+        <motion.div
+          className="mt-6 grid md:grid-cols-2 gap-6 w-full"
+          initial="hidden"
+          animate={animOn ? undefined : "hidden"}
+          whileInView={animOn ? "show" : undefined}
+          viewport={{ once: true }}
+          variants={{
+            hidden: {},
+            show: { transition: { staggerChildren: 0.1 } },
+          }}
+        >
           {SLOTS.map((s, idx) => (
             <motion.article
               key={idx}
               className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm hover:shadow-md transition-shadow text-center w-full"
-              initial="hidden"
-              whileInView="show"
-              viewport={{ once: true }}
               variants={fadeUp}
+              whileHover={{ y: -4 }}
             >
               <h3 className="text-lg font-bold">
                 {dateKorean(s.date)} {s.dayLabel}
@@ -398,7 +464,8 @@ export default function JjigaeRun() {
               <p className="text-neutral-700 mt-1">{s.time}</p>
               <p className="text-sm text-neutral-600 mt-2">정원 15명</p>
               <div className="mt-3">
-                <span
+                <motion.span
+                  layout
                   className={
                     "inline-block rounded-full px-3 py-1 text-sm font-semibold " +
                     (s.status === "closed"
@@ -407,9 +474,9 @@ export default function JjigaeRun() {
                   }
                 >
                   {s.status === "closed" ? "마감" : "신청 가능"}
-                </span>
+                </motion.span>
               </div>
-              <a
+              <motion.a
                 href={IG_LINK}
                 target="_blank"
                 rel="noreferrer"
@@ -419,12 +486,13 @@ export default function JjigaeRun() {
                     ? "cursor-not-allowed bg-neutral-200 text-neutral-500"
                     : "bg-orange-600 text-white hover:bg-orange-700")
                 }
+                whileTap={{ scale: 0.98 }}
               >
                 {s.status === "closed" ? "DM 문의" : "DM 신청"}
-              </a>
+              </motion.a>
             </motion.article>
           ))}
-        </div>
+        </motion.div>
       </section>
 
       {/* Join */}
@@ -432,7 +500,8 @@ export default function JjigaeRun() {
         <motion.div
           className="rounded-2xl border border-neutral-200 bg-white p-6 w-full"
           initial="hidden"
-          whileInView="show"
+          animate={animOn ? undefined : "hidden"}
+          whileInView={animOn ? "show" : undefined}
           viewport={{ once: true }}
           variants={fadeUp}
         >
@@ -452,14 +521,15 @@ export default function JjigaeRun() {
             </li>
           </ol>
           <div className="text-center">
-            <a
+            <motion.a
               href={IG_LINK}
               target="_blank"
               rel="noreferrer"
               className="mt-6 inline-flex items-center justify-center rounded-xl bg-orange-600 px-5 py-3 font-semibold text-white hover:bg-orange-700 transition shadow"
+              whileTap={{ scale: 0.98 }}
             >
               인스타 DM 보내기
-            </a>
+            </motion.a>
           </div>
         </motion.div>
       </section>
@@ -469,19 +539,30 @@ export default function JjigaeRun() {
         <motion.div
           className="rounded-2xl border border-neutral-200 bg-white p-6 w-full"
           initial="hidden"
-          whileInView="show"
+          animate={animOn ? undefined : "hidden"}
+          whileInView={animOn ? "show" : undefined}
           viewport={{ once: true }}
-          variants={fadeUp}
+          variants={{
+            hidden: {},
+            show: { transition: { staggerChildren: 0.08 } },
+          }}
         >
           <div className="md:flex items-center gap-8 w-full">
-            <div className="md:w-1/2">
-              <img
+            <motion.div className="md:w-1/2" variants={fadeUp}>
+              <motion.img
                 src={shirtImage}
                 alt="JJIGAE RUN 티셔츠"
                 className="w-full max-w-md rounded-xl shadow mx-auto"
+                initial={{ rotate: -1, opacity: 0 }}
+                animate={
+                  animOn
+                    ? { rotate: 0, opacity: 1 }
+                    : { rotate: -1, opacity: 0 }
+                }
+                transition={{ type: "spring", stiffness: 120, damping: 12 }}
               />
-            </div>
-            <div className="mt-6 md:mt-0 md:w-1/2">
+            </motion.div>
+            <motion.div className="mt-6 md:mt-0 md:w-1/2" variants={fadeUp}>
               <h2 className="text-2xl font-extrabold mb-2">티셔츠 단독 구매</h2>
               <p className="mt-2 text-neutral-700">
                 가격: <b>25,000원</b>
@@ -491,15 +572,16 @@ export default function JjigaeRun() {
                 * DM에 <b>티셔츠 단품</b>, 원하는 <b>사이즈</b>, <b>수량</b>을
                 적어 보내주세요.
               </p>
-              <a
+              <motion.a
                 href={IG_LINK}
                 target="_blank"
                 rel="noreferrer"
                 className="mt-6 inline-flex items-center justify-center rounded-xl bg-orange-600 px-5 py-3 font-semibold text-white hover:bg-orange-700 transition shadow"
+                whileTap={{ scale: 0.98 }}
               >
                 DM으로 구매 문의
-              </a>
-            </div>
+              </motion.a>
+            </motion.div>
           </div>
         </motion.div>
       </section>
